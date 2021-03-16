@@ -1,22 +1,26 @@
-import React, { useEffect, useState } from 'react'
+import React, { useCallback, useState } from 'react'
 import { StyleSheet } from 'react-native'
+import { useFocusEffect } from '@react-navigation/native'
 
 import UserGuest from './UserGuest'
 import UserLogged from './UserLogged'
 import Loading from '../../components/Loading'
 
-import { isUserLogged } from '../../utils/actions'
+import { getCurrentUser } from '../../utils/actions'
 
-const Account = () => {
+const Account = ({ route }) => {
+
+    const { close } = route.params === undefined ? {} : route.params
 
     const [login, setLogin] = useState(null)
 
-    useEffect(() => {
-        setTimeout(() => {
-            setLogin(isUserLogged())
-        },2000);
-    }, [])
-
+    useFocusEffect(
+        useCallback(() => {
+            const user = getCurrentUser()
+            user ? setLogin(true) : setLogin(false)
+        },[close])
+    )
+    
     if (login == null) { return <Loading isVisible={true} text="Cargando....." /> }
 
     return login ? <UserLogged /> : <UserGuest />
