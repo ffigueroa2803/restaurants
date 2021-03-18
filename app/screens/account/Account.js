@@ -2,23 +2,27 @@ import React, { useCallback, useState } from 'react'
 import { StyleSheet } from 'react-native'
 import { useFocusEffect } from '@react-navigation/native'
 
+import { firebaseApp } from '../../utils/firebase'
+import firebase from 'firebase/app'
+import 'firebase/auth'
+import 'firebase/firestore'
+
 import UserGuest from './UserGuest'
 import UserLogged from './UserLogged'
 import Loading from '../../components/Loading'
 
-import { getCurrentUser } from '../../utils/actions'
+const db = firebase.firestore(firebaseApp)
 
-const Account = ({ route }) => {
-
-    const { close } = route.params === undefined ? {} : route.params
+const Account = () => {
 
     const [login, setLogin] = useState(null)
 
     useFocusEffect(
         useCallback(() => {
-            const user = getCurrentUser()
-            user ? setLogin(true) : setLogin(false)
-        },[close])
+            firebase.auth().onAuthStateChanged((userInfo) => {
+                userInfo ? setLogin(true) : setLogin(false)
+            })
+        },[])
     )
     
     if (login == null) { return <Loading isVisible={true} text="Cargando....." /> }

@@ -1,7 +1,7 @@
 
-import React from 'react';
+import React from 'react'
 
-import Navigation from './navigations/Navigation';
+import Navigation from './navigations/Navigation'
 
 const App = () => {
 
@@ -10,4 +10,4 @@ const App = () => {
   );
 };
 
-export default App;
+export default App
