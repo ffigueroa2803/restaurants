@@ -6,7 +6,7 @@ import 'firebase/auth'
 
 import Loading from '../../components/Loading'
 
-const Restaurants = () => {
+const Restaurants = ({navigation}) => {
 
     const [user, setUser] = useState(null)
     const [loading, setLoading] = useState(false)
@@ -32,6 +32,7 @@ const Restaurants = () => {
                         color="#442484"
                         reverse
                         containerStyle={styles.btnContainer}
+                        onPress={() => navigation.navigate("add-restaurant-stack")}
                     />
                 )
             }
