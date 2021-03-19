@@ -10,7 +10,7 @@ import ImagePicker  from 'react-native-image-crop-picker'
 
 import { validateEmail } from '../../utils/helpers'
 import Modal from '../Modal'
-import { getCurrentUser, uploadImage } from '../../utils/actions'
+import { addDocumentWithoutId, getCurrentUser, uploadImage } from '../../utils/actions'
 
 const widthScreen = Dimensions.get("window").width
 
@@ -56,7 +56,7 @@ const AddRestaurantForm = ({toastRef, setLoading, navigation}) => {
             return
         }
 
-        navigation.navigate("restaurants")
+        navigation.navigate("restaurants-stack")
     }
     
     const uploadImages = async() => {
@@ -82,6 +82,7 @@ const AddRestaurantForm = ({toastRef, setLoading, navigation}) => {
         }
 
         if (isEmpty(formData.address)) {
+            console.log(formData.address)
             setErrorAddress("Debes ingresar la dirección del restaurante.")
             isValid = false
         }
@@ -91,7 +92,7 @@ const AddRestaurantForm = ({toastRef, setLoading, navigation}) => {
             isValid = false
         }
 
-        if (size(formData.phone) < 10) {
+        if (size(formData.phone) < 9) {
             setErrorPhone("Debes ingresar un teléfono de restaurante válido.")
             isValid = false
         }

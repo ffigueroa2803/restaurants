@@ -7,6 +7,8 @@ import { fileToBlob } from './helpers'
 
 const db = firebase.firestore(firebaseApp)
 
+firebase.firestore().settings({ experimentalForceLongPolling: true })
+
 export const isUserLogged = () => {
     let isLogged = false
     firebase.auth().onAuthStateChanged((user) => {
