@@ -152,6 +152,12 @@ android {
             keyAlias 'androiddebugkey'
             keyPassword 'android'
         }
+        release {
+            storeFile file('restaurants.keystore')
+            storePassword 'Psw123456'
+            keyAlias 'Restaurants'
+            keyPassword 'Psw123456'
+        }
     }
     buildTypes {
         debug {
@@ -163,6 +169,7 @@ android {
             signingConfig signingConfigs.debug
             minifyEnabled enableProguardInReleaseBuilds
             proguardFiles getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro"
+            signingConfig signingConfigs.release
         }
     }
 
