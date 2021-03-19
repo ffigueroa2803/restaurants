@@ -75,7 +75,7 @@ const LoginForm = () => {
             />
             <Input
                 containerStyle={styles.input}
-                placeholder="Ingrese su contraseña....."
+                placeholder="Ingrese su clave....."
                 password={true}
                 secureTextEntry={!showPassword}
                 onChange={(e) => onChange(e, "password")}

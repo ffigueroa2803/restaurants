@@ -1,14 +1,16 @@
 import React, { useState, useEffect } from 'react'
-import { Alert, Dimensions, ScrollView, StyleSheet, Text, View } from 'react-native'
+import { Alert, Dimensions, ScrollView, StyleSheet, View } from 'react-native'
 import { Avatar, Button, Icon, Image, Input } from 'react-native-elements'
 import CountryPicker from 'react-native-country-picker-modal'
-import { isEmpty, map, size } from 'lodash'
+import { filter, isEmpty, map, size } from 'lodash'
 import MapView, { Marker, PROVIDER_GOOGLE } from 'react-native-maps'
+import Geolocation from 'react-native-geolocation-service'
 import uuid from 'random-uuid-v4'
+import ImagePicker  from 'react-native-image-crop-picker'
 
-import { getCurrentLocation, validateEmail } from '../../utils/helpers'
+import { validateEmail } from '../../utils/helpers'
 import Modal from '../Modal'
-
+import { getCurrentUser, uploadImage } from '../../utils/actions'
 
 const widthScreen = Dimensions.get("window").width
 
@@ -28,10 +30,46 @@ const AddRestaurantForm = ({toastRef, setLoading, navigation}) => {
         if (!validForm()) {
             return
         }
+
+        setLoading(true)
+        const responseUploadImages = await uploadImages()
+        const restaurant = {
+            name: formData.name,
+            address: formData.address,
+            description: formData.description,
+            callingCode: formData.callingCode,
+            phone: formData.phone,
+            location: locationRestaurant,
+            email: formData.email,
+            images: responseUploadImages,
+            rating: 0,
+            ratingTotal: 0,
+            quantityVoting: 0,
+            createAt: new Date(),
+            createBy: getCurrentUser().uid
+        }
+        const responseAddDocument = await addDocumentWithoutId("restaurants", restaurant)
+        setLoading(false)
+
+        if (!responseAddDocument.statusResponse) {
+            toastRef.current.show("Error al grabar el restaurante, por favor intenta más tarde.", 3000)
+            return
+        }
+
+        navigation.navigate("restaurants")
     }
     
     const uploadImages = async() => {
-        
+        const imagesUrl = []
+        await Promise.all(
+            map(imagesSelected, async(image) => {
+                const response = await uploadImage(image, "restaurants", uuid())
+                if (response.statusResponse) {
+                   imagesUrl.push(response.url)
+                }
+            })
+        )
+        return imagesUrl
     }
     
     const validForm = () => {
@@ -125,13 +163,16 @@ const MapRestaurant = ({ isVisibleMap, setIsVisibleMap, setLocationRestaurant, t
     const [newRegion, setNewRegion] = useState(null)
 
     useEffect(() => {
-        (async() => {
-            const response = await getCurrentLocation()
-            console.log(response)
-            if (response.status) {
-                setNewRegion(response.location)
-            }
-        })()
+        Geolocation.getCurrentPosition(position => {
+            setNewRegion({
+                latitude: position.coords.latitude,
+                longitude: position.coords.longitude,
+                latitudeDelta: 0.0922,
+                longitudeDelta: 0.0421
+            })},
+            error => Alert.alert(error.message),
+            { enableHighAccuracy: true, timeout: 20000, maximumAge: 1000 }
+        )
     }, [])
 
     const confirmLocation = () => {
@@ -141,7 +182,7 @@ const MapRestaurant = ({ isVisibleMap, setIsVisibleMap, setLocationRestaurant, t
     }
 
     return (
-        <Modal isVisible={isVisibleMap} setIsVisible={setIsVisibleMap}>
+        <Modal isVisible={isVisibleMap} setVisible={setIsVisibleMap}>
             <View>
                 {
                     newRegion && (
@@ -198,8 +239,23 @@ const ImageRestaurant = ({ imageRestaurant }) => {
 
 const UploadImage = ({ toastRef, imagesSelected, setImagesSelected }) => {
 
+    let options = {
+        writeTempFile: true,
+        width: 400,
+        height: 300,
+        cropping: true,
+        compressImageQuality: 0.7,
+        smartAlbums:['PhotoStream', 'Generic', 'Panoramas', 'Videos', 'Favorites', 'Timelapses', 'AllHidden', 'RecentlyAdded', 'Bursts', 'SlomoVideos', 'UserLibrary', 'SelfPortraits', 'Screenshots', 'DepthEffect', 'LivePhotos', 'Animated', 'LongExposure']
+    }
+
     const imageSelect = async() => {
-        
+        ImagePicker.openPicker(options)
+        .then(async image => {
+            setImagesSelected([...imagesSelected, image.path])
+        }).catch(e => {
+            toastRef.current.show("No has seleccionado ninguna imagen.", 3000)
+            return
+        })
     }
 
     const removeImage = (image) => {
@@ -267,10 +323,6 @@ const  FormAdd = ({
     locationRestaurant
 }) => {
 
-    const [country, setCountry] = useState("PE")
-    const [callingCode, setCallingCode] = useState("51")
-    const [phone, setPhone] = useState("")
-
     const onChange = (e, type) => {
         setFormData({ ...formData, [type] : e.nativeEvent.text })
     }
@@ -309,7 +361,7 @@ const  FormAdd = ({
                     withFilter
                     withCallingCodeButton
                     containerStyle={styles.countryPicker}
-                    countryCode={country}
+                    countryCode={formData.country}
                     onSelect={(country) => {
                         setFormData({ 
                             ...formData, 
