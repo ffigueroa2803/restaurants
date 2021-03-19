@@ -37,7 +37,7 @@ const styles = StyleSheet.create({
         justifyContent: 'flex-end',
         alignItems: 'center',
       },
-      map: {
+    map: {
         ...StyleSheet.absoluteFillObject,
-      },
+    },
 })

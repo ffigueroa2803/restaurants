@@ -5,6 +5,7 @@ import CountryPicker from 'react-native-country-picker-modal'
 import { filter, isEmpty, map, size } from 'lodash'
 import MapView, { Marker, PROVIDER_GOOGLE } from 'react-native-maps'
 import Geolocation from 'react-native-geolocation-service'
+import RNLocation from 'react-native-location'
 import uuid from 'random-uuid-v4'
 import ImagePicker  from 'react-native-image-crop-picker'
 
@@ -160,20 +161,36 @@ const AddRestaurantForm = ({toastRef, setLoading, navigation}) => {
 export default AddRestaurantForm
 
 const MapRestaurant = ({ isVisibleMap, setIsVisibleMap, setLocationRestaurant, toastRef }) => {
-
+    
     const [newRegion, setNewRegion] = useState(null)
 
     useEffect(() => {
-        Geolocation.getCurrentPosition(position => {
-            setNewRegion({
-                latitude: position.coords.latitude,
-                longitude: position.coords.longitude,
-                latitudeDelta: 0.0922,
-                longitudeDelta: 0.0421
-            })},
-            error => Alert.alert(error.message),
-            { enableHighAccuracy: true, timeout: 20000, maximumAge: 1000 }
-        )
+        (async() => {
+            RNLocation.requestPermission({
+                ios: "whenInUse",
+                android: {
+                  detail: "coarse"
+                }
+            }).then(granted => {
+                if(granted) {
+                    Geolocation.getCurrentPosition(
+                        position => {
+                            setNewRegion({
+                                latitude: position.coords.latitude,
+                                longitude: position.coords.longitude,
+                                latitudeDelta: 0.0922,
+                                longitudeDelta: 0.0421
+                            })
+                        },
+                        error => Alert.alert(error.message),
+                        { enableHighAccuracy: false, timeout: 20000, maximumAge: 1000 }
+                    )
+                } else {
+                    Alert.alert("Debes dar permisos para la localización.")
+                    return response
+                }
+            })
+        })()
     }, [])
 
     const confirmLocation = () => {
