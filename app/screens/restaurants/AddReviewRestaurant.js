@@ -26,6 +26,7 @@ const AddReviewRestaurant = ({ navigation, route }) => {
 
         setLoading(true)
         const user = getCurrentUser()
+        
         const data = {
             idUser: user.uid,
             avatarUser: user.photoURL,

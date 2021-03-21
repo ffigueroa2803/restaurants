@@ -42,7 +42,7 @@ const LoginForm = () => {
             setErrorPassword(result.error)
             return
         }
-        navigation.navigate("account-stack")
+        navigation.navigate("account", { screen: "account-stack" })
     }
 
     const ValidateData = () => {

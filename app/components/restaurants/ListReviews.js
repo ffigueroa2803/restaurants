@@ -48,7 +48,7 @@ const ListReviews = ({ navigation, idRestaurant }) => {
                 ) : (
                     <Text 
                         style={styles.mustLoginText}
-                        onPress={() => navigation.navigate("login")}
+                        onPress={() => navigation.navigate("account", { screen: "login-stack" })}
                     >
                         Para escribir una opinión es necesario estar logueado.{" "}
                         <Text style={styles.loginText}>
@@ -59,8 +59,8 @@ const ListReviews = ({ navigation, idRestaurant }) => {
             }
             {
                 size(reviews) > 0 && (
-                    map(reviews, reviewDocument => (
-                        <Review reviewDocument={reviewDocument}/>
+                    map(reviews, (reviewDocument, index) => (
+                        <Review key={index} reviewDocument={reviewDocument}/>
                     ))
                 )
             }
