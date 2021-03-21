@@ -6,7 +6,7 @@ import { isEmpty } from 'lodash'
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
 
 import Loading from '../../components/Loading'
-import { addDocumentWithoutId, getCurrentUser, getDocumentById, updateDocument } from '../../utils/actions'
+import { addDocumentWithoutId, getCurrentUser, getDocumentById, retrieveUrlPhoto, updateDocument } from '../../utils/actions'
 
 const AddReviewRestaurant = ({ navigation, route }) => {
     const { idRestaurant } = route.params
@@ -27,9 +27,11 @@ const AddReviewRestaurant = ({ navigation, route }) => {
         setLoading(true)
         const user = getCurrentUser()
         
+        const getPhotoUrl = await retrieveUrlPhoto("avatars", user.uid)
+
         const data = {
             idUser: user.uid,
-            avatarUser: user.photoURL,
+            avatarUser: getPhotoUrl.url,
             idRestaurant,
             title,
             review,

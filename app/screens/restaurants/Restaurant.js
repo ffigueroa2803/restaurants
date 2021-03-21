@@ -29,12 +29,11 @@ const Restaurant = ({ navigation, route }) => {
     firebase.auth().onAuthStateChanged(user => {
         user ? setUserLogged(true) : setUserLogged(false)
     })
-
-    navigation.setOptions({ title: name })
-
+        
     useFocusEffect(
         useCallback(() => {
             (async() => {
+                navigation.setOptions({ title: name })
                 const response = await getDocumentById("restaurants", id)
                 if (response.statusResponse) {
                     setRestaurant(response.document)
@@ -50,7 +49,9 @@ const Restaurant = ({ navigation, route }) => {
         (async() => {
             if (userLogged && restaurant) {
                 const response = await getIsFavorite(restaurant.id)
-                response.statusResponse && setIsFavorite(response.isFavorite)
+                if (response.statusResponse) {
+                    setIsFavorite(response.isFavorite)
+                }
             }
         })()
     }, [userLogged, restaurant])

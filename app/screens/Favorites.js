@@ -39,9 +39,7 @@ const Favorites = ({ navigation }) => {
         return <UserNoLogged navigation={navigation}/>
     }
 
-    if (!restaurants) {
-        return <Loading isVisible={true} text="Cargando restaurantes..."/>
-    } else if(restaurants?.length === 0){
+    if(restaurants?.length === 0){
         return <NotFoundRestaurants/>
     }
 
