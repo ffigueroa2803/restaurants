@@ -162,7 +162,7 @@ const UserNoLogged = ({ navigation }) => {
                 title="Ir al Login"
                 containerStyle={{ marginTop: 20, width: "80%" }}
                 buttonStyle={{ backgroundColor: "#442484" }}
-                onPress={() => navigation.navigate("account", { screen: "login" })}
+                onPress={() => navigation.navigate("account", { screen: "login-stack" })}
             />
         </View>
     )
