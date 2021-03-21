@@ -1,1 +1,10 @@
-AIzaSyAnw5fYncfcfaRPWWvf73MTsR3DNGD07e0
+API key 2 = AIzaSyAnw5fYncfcfaRPWWvf73MTsR3DNGD07e0
+
+
+Huellas digitales del certificado:
+         MD5: BA:98:6C:87:8A:1C:C6:21:A7:AA:04:05:A6:C9:C7:86
+         SHA1: A6:0F:AC:C1:55:D7:43:CC:1E:31:3A:6B:25:EE:F3:40:AF:E3:B6:EE
+         SHA256: 2D:9C:E5:99:D6:07:11:2C:AE:3B:A8:29:EB:BD:A4:16:C4:29:2A:67:74:01:E9:39:1C:59:04:B2:FC:AD:14:55
+Nombre del algoritmo de firma: SHA256withRSA
+Algoritmo de clave pública de asunto: Clave RSA de 2048 bits
+Versión: 3

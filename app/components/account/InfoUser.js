@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import { Alert, StyleSheet, Text, View } from 'react-native'
+import { ActivityIndicator, Alert, StyleSheet, Text, View } from 'react-native'
 import { Avatar } from 'react-native-elements'
 import ImagePicker  from 'react-native-image-crop-picker'
 
@@ -67,7 +67,8 @@ const InfoUser = ({ user, setLoading, setLoadingText }) => {
 
     return (
         <View style={styles.container}>
-            <Avatar 
+            <Avatar
+                renderPlaceholderContent={<ActivityIndicator color="#fff"/>} 
                 rounded
                 onPress={changePhoto}
                 size="large"

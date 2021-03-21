@@ -1,15 +1,23 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState, useCallback } from 'react'
 import { StyleSheet, Text, View } from 'react-native'
 import { Icon } from 'react-native-elements'
+import { size } from 'lodash'
+import { useFocusEffect } from '@react-navigation/native'
 import firebase from 'firebase/app'
 import 'firebase/auth'
 
 import Loading from '../../components/Loading'
+import ListRestaurants from '../../components/restaurants/ListRestaurants'
+import { getMoreRestaurants, getRestaurants } from '../../utils/actions'
 
 const Restaurants = ({navigation}) => {
 
     const [user, setUser] = useState(null)
+    const [startRestaurant, setStartRestaurant] = useState(null)
+    const [restaurants, setRestaurants] = useState([])
     const [loading, setLoading] = useState(false)
+
+    const limitRestaurants = 7
 
     useEffect(() => {
         firebase.auth().onAuthStateChanged((userInfo) => {
@@ -17,13 +25,54 @@ const Restaurants = ({navigation}) => {
         })
     }, [])
 
+    useFocusEffect(
+        useCallback(() => {
+            async function getData() {
+                setLoading(true)
+                const response = await getRestaurants(limitRestaurants)
+                if (response.statusResponse) {
+                    setStartRestaurant(response.startRestaurant)
+                    setRestaurants(response.restaurants)
+                }
+                setLoading(false)
+            }
+            getData()
+        }, [])
+    )
+
+    const handleLoadMore = async() => {
+        if (!startRestaurant) {
+            return
+        }
+
+        setLoading(true)
+        const response = await getMoreRestaurants(limitRestaurants, startRestaurant)
+        if (response.statusResponse) {
+            setStartRestaurant(response.startRestaurant)
+            setRestaurants([...restaurants, ...response.restaurants])
+        }
+        setLoading(false)
+    }
+
     if (user === null) {
         return <Loading isVisible={true} text="Cargando..."/>
     }
 
     return (
         <View style={styles.viewBody}>
-            <Text>Restaurants..</Text>
+            {
+                size(restaurants) > 0 ? (
+                    <ListRestaurants
+                        restaurants={restaurants}
+                        navigation={navigation}
+                        handleLoadMore={handleLoadMore}
+                    />
+                ) : (
+                    <View style={styles.notFoundView}>
+                        <Text style={styles.notFoundText}>No hay restaurantes registrados.</Text>
+                    </View>
+                )
+            }
             {
                 user && (
                     <Icon
