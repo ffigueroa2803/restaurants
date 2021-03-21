@@ -114,7 +114,7 @@ const Restaurant = ({ restaurant, setLoading, toastRef, navigation, setReloadDat
         <View style={styles.restaurant}>
             <TouchableOpacity
                 onPress={() => navigation.navigate("restaurants", {
-                    screen: "restaurant",
+                    screen: "restaurant-stack",
                     params: { id, name }
                 })}
             >

@@ -4,8 +4,8 @@ import { useFocusEffect } from '@react-navigation/native'
 
 import { firebaseApp } from '../../utils/firebase'
 import firebase from 'firebase/app'
-import 'firebase/auth'
 import 'firebase/firestore'
+import 'firebase/auth'
 
 import UserGuest from './UserGuest'
 import UserLogged from './UserLogged'
