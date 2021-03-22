@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useCallback } from 'react'
-import { StyleSheet, Text, View } from 'react-native'
+import { ActivityIndicator, StyleSheet, Text, View } from 'react-native'
 import { Icon } from 'react-native-elements'
 import { size } from 'lodash'
 import { useFocusEffect } from '@react-navigation/native'
@@ -16,42 +16,42 @@ const Restaurants = ({navigation}) => {
     const [startRestaurant, setStartRestaurant] = useState(null)
     const [restaurants, setRestaurants] = useState([])
     const [loading, setLoading] = useState(false)
+    const [pagination, setPagination] = useState(false)
 
     const limitRestaurants = 7
-
-    useEffect(() => {
-        firebase.auth().onAuthStateChanged((userInfo) => {
-            userInfo ? setUser(true) : setUser(false)
-        })
-    }, [])
+    
+    firebase.auth().onAuthStateChanged((userInfo) => {
+        userInfo ? setUser(true) : setUser(false)
+    })
 
     useFocusEffect(
         useCallback(() => {
-            async function getData() {
-                setLoading(true)
-                const response = await getRestaurants(limitRestaurants)
-                if (response.statusResponse) {
-                    setStartRestaurant(response.startRestaurant)
-                    setRestaurants(response.restaurants)
-                }
-                setLoading(false)
-            }
             getData()
         }, [])
     )
 
-    const handleLoadMore = async() => {
-        if (!startRestaurant) {
-            return
-        }
-
+    const getData = async() => {
         setLoading(true)
-        const response = await getMoreRestaurants(limitRestaurants, startRestaurant)
+        const response = await getRestaurants(limitRestaurants, startRestaurant, pagination)
         if (response.statusResponse) {
             setStartRestaurant(response.startRestaurant)
             setRestaurants([...restaurants, ...response.restaurants])
+            setLoading(false)
+            setPagination(true)
         }
-        setLoading(false)
+    }
+
+    const renderFooter = () => {
+        return (
+          // Footer View with Loader
+          <View style={styles.footer}>
+            {loading ? (
+              <ActivityIndicator
+                color="black"
+                style={{margin: 15}} />
+            ) : null}
+          </View>
+        )
     }
 
     if (user === null) {
@@ -65,7 +65,8 @@ const Restaurants = ({navigation}) => {
                     <ListRestaurants
                         restaurants={restaurants}
                         navigation={navigation}
-                        handleLoadMore={handleLoadMore}
+                        data={getData}
+                        renderFooter={renderFooter}
                     />
                 ) : (
                     <View style={styles.notFoundView}>

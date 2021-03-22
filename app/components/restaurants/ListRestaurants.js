@@ -5,20 +5,36 @@ import { formatPhone } from '../../utils/helpers'
 
 import { size } from 'lodash'
 
-const ListRestaurants = ({ restaurants, navigation, handleLoadMore }) => {
+const ListRestaurants = ({ restaurants, navigation, data, renderFooter }) => {
+
+    const ItemSeparatorView = () => {
+        return (
+          // Flat List Item Separator
+          <View
+            style={{
+              height: 0.5,
+              width: '100%',
+              backgroundColor: '#C8C8C8',
+            }}
+          />
+        )
+    }
+
     return (
         <View>
             <FlatList
                 data={restaurants}
                 keyExtractor={(item, index) => index.toString()}
-                onEndReachedThreshold={0.5}
-                onEndReached={handleLoadMore}
+                ItemSeparatorComponent={ItemSeparatorView}
                 renderItem={(restaurant) => (
                     <Restaurant 
                         restaurant={restaurant} 
                         navigation={navigation}
                     />
                 )}
+                onEndReached={data}
+                onEndReachedThreshold={0.5}
+                ListFooterComponent={renderFooter}
             />
         </View>
     )
@@ -85,5 +101,11 @@ const styles = StyleSheet.create({
         paddingTop: 2,
         color: "grey",
         width: "75%"
-    }
+    },
+    footer: {
+        padding: 10,
+        justifyContent: 'center',
+        alignItems: 'center',
+        flexDirection: 'row',
+    },
 })
