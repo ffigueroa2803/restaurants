@@ -5,7 +5,7 @@ import { formatPhone } from '../../utils/helpers'
 
 import { size } from 'lodash'
 
-const ListRestaurants = ({ restaurants, navigation, data, renderFooter }) => {
+const ListRestaurants = ({ restaurants, navigation, handleLoadMore, renderFooter, onEndReachedCalledDuringMomentum, isMoreLoading }) => {
 
     const ItemSeparatorView = () => {
         return (
@@ -32,9 +32,14 @@ const ListRestaurants = ({ restaurants, navigation, data, renderFooter }) => {
                         navigation={navigation}
                     />
                 )}
-                onEndReached={data}
-                onEndReachedThreshold={0.5}
+                onEndReached={() => {
+                    if (!onEndReachedCalledDuringMomentum && !isMoreLoading) {
+                        handleLoadMore()
+                    }
+                }}
+                onEndReachedThreshold={0.1}
                 ListFooterComponent={renderFooter}
+                onMomentumScrollBegin = {() => {onEndReachedCalledDuringMomentum = false}}
             />
         </View>
     )

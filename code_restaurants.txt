@@ -12,13 +12,10 @@ import { getMoreRestaurants, getRestaurants } from '../../utils/actions'
 
 const Restaurants = ({navigation}) => {
 
-    let onEndReachedCalledDuringMomentum = false
-
     const [user, setUser] = useState(null)
     const [startRestaurant, setStartRestaurant] = useState(null)
     const [restaurants, setRestaurants] = useState([])
     const [loading, setLoading] = useState(false)
-    const [isMoreLoading, setIsMoreLoading] = useState(false)
     const [pagination, setPagination] = useState(false)
 
     const limitRestaurants = 7
@@ -29,36 +26,26 @@ const Restaurants = ({navigation}) => {
 
     useFocusEffect(
         useCallback(() => {
-            async function getData() {
-                setLoading(true)
-                const response = await getRestaurants(limitRestaurants, null, false)
-                if (response.statusResponse) {
-                    setStartRestaurant(response.startRestaurant)
-                    setRestaurants(response.restaurants)
-                }
-                setLoading(false)
-            }
             getData()
         }, [])
     )
 
-    const handleLoadMore = async() => {
-        setIsMoreLoading(true)
+    const getData = async() => {
+        setLoading(true)
         const response = await getRestaurants(limitRestaurants, startRestaurant, pagination)
         if (response.statusResponse) {
             setStartRestaurant(response.startRestaurant)
             setRestaurants([...restaurants, ...response.restaurants])
             setPagination(true)
         }
-        setIsMoreLoading(false)
-        onEndReachedCalledDuringMomentum = true
+        setLoading(false)
     }
 
     const renderFooter = () => {
         return (
           // Footer View with Loader
           <View style={styles.footer}>
-            { isMoreLoading ? (
+            { loading ? (
               <ActivityIndicator
                 color="black"
                 style={{margin: 15}} />
@@ -78,10 +65,8 @@ const Restaurants = ({navigation}) => {
                     <ListRestaurants
                         restaurants={restaurants}
                         navigation={navigation}
-                        handleLoadMore={handleLoadMore}
+                        data={getData}
                         renderFooter={renderFooter}
-                        onEndReachedCalledDuringMomentum={onEndReachedCalledDuringMomentum}
-                        isMoreLoading={isMoreLoading}
                     />
                 ) : (
                     <View style={styles.notFoundView}>
@@ -130,3 +115,38 @@ const styles = StyleSheet.create({
         fontWeight: "bold"
     }
 })
+
+
+export const getRestaurants = async(limitRestaurants, startRestaurant, pagination) => {
+    const result = { statusResponse: true, error: null, restaurants: [], startRestaurant: null }
+    try {
+        if (startRestaurant == null && pagination == true) { return result }
+        const response = pagination ? (
+            await db
+            .collection("restaurants")
+            .orderBy("createAt", "desc")
+            .startAfter(startRestaurant.createAt)
+            .limit(limitRestaurants)
+            .get()
+        ) : (
+            await db
+            .collection("restaurants")
+            .orderBy("createAt", "desc")
+            .limit(limitRestaurants)
+            .get()
+        )
+        
+        if (response.docs.length > 0) {
+            result.startRestaurant = response.docs[response.docs.length - 1].data()
+        }
+        response.forEach((doc) => {
+            const restaurant = doc.data()
+            restaurant.id = doc.id
+            result.restaurants.push(restaurant)
+        })
+    } catch (error) {
+        result.statusResponse = false
+        result.error = error
+    }
+    return result     
+}
