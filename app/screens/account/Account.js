@@ -17,14 +17,10 @@ const Account = () => {
 
     const [login, setLogin] = useState(null)
 
-    useFocusEffect(
-        useCallback(() => {
-            firebase.auth().onAuthStateChanged((userInfo) => {
-                userInfo ? setLogin(true) : setLogin(false)
-            })
-        },[])
-    )
-    
+    firebase.auth().onAuthStateChanged((userInfo) => {
+        userInfo ? setLogin(true) : setLogin(false)
+    })
+   
     if (login == null) { return <Loading isVisible={true} text="Cargando....." /> }
 
     return login ? <UserLogged /> : <UserGuest />
