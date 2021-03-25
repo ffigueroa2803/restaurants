@@ -17,6 +17,7 @@
     "@react-navigation/native": "^6.0.0-next.1",
     "@react-navigation/stack": "^6.0.0-next.4",
     "firebase": "^8.3.0",
+    "firesql": "^2.0.2",
     "lodash": "^4.17.21",
     "moment": "^2.29.1",
     "random-uuid-v4": "^0.0.9",

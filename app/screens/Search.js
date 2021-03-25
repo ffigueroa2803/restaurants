@@ -1,109 +1,109 @@
-import React, { useEffect, useState } from 'react'
-import { ActivityIndicator, FlatList, SafeAreaView, StyleSheet, Text, View } from 'react-native'
+import React, { useState, useEffect } from 'react'
+import { StyleSheet, Text, View, FlatList, ActivityIndicator } from 'react-native'
+import { SearchBar, ListItem, Icon, Image } from 'react-native-elements'
+import { isEmpty, size } from 'lodash'
 
-const Search = () => {
-    const [loading, setLoading] = useState(false);
-  const [dataSource, setDataSource] = useState([]);
-  const [offset, setOffset] = useState(1);
-  const [isListEnd, setIsListEnd] = useState(false);
+import { searchRestaurants } from '../utils/actions'
 
-  useEffect(() => getData(), []);
+const Search = ({ navigation }) => {
 
-  const getData = () => {
-    console.log(offset);
-    if (!loading && !isListEnd) {
-      console.log('getData');
-      setLoading(true);
-      // Service to get the data from the server to render
-      fetch('https://aboutreact.herokuapp.com/getpost.php?offset='
-        + offset)
-        // Sending the currect offset with get request
-        .then((response) => response.json())
-        .then((responseJson) => {
-          // Successful response from the API Call
-          console.log(responseJson);
-          if (responseJson.results.length > 0) {
-            setOffset(offset + 1);
-            // After the response increasing the offset
-            setDataSource([...dataSource, ...responseJson.results]);
-            setLoading(false);
-          } else {
-            setIsListEnd(true);
-            setLoading(false);
+  const [search, setSearch] = useState("")
+  const [restaurants, setRestaurants] = useState([])
+
+  useEffect(() => {
+      if (isEmpty(search)) {
+          return
+      }
+
+      async function getData() {
+          const response = await searchRestaurants(search)
+          if (response.statusResponse) {
+              setRestaurants(response.restaurants)
           }
-        })
-        .catch((error) => {
-          console.error(error);
-        });
-    }
-  };
-
-  const renderFooter = () => {
-    return (
-      // Footer View with Loader
-      <View style={styles.footer}>
-        {loading ? (
-          <ActivityIndicator
-            color="black"
-            style={{margin: 15}} />
-        ) : null}
-      </View>
-    );
-  };
-
-  const ItemView = ({item}) => {
-    return (
-      // Flat List Item
-      <Text
-        style={styles.itemStyle}
-        onPress={() => getItem(item)}>
-        {item.id}
-        {'.'}
-        {item.title.toUpperCase()}
-      </Text>
-    );
-  };
-
-  const ItemSeparatorView = () => {
-    return (
-      // Flat List Item Separator
-      <View
-        style={{
-          height: 0.5,
-          width: '100%',
-          backgroundColor: '#C8C8C8',
-        }}
-      />
-    );
-  };
-
-  const getItem = (item) => {
-    // Function for click on an item
-    alert('Id : ' + item.id + ' Title : ' + item.title);
-  };
+      }
+      getData();
+  }, [search])
 
   return (
-    <SafeAreaView style={{flex: 1}}>
-      <FlatList
-        data={dataSource}
-        keyExtractor={(item, index) => index.toString()}
-        ItemSeparatorComponent={ItemSeparatorView}
-        renderItem={ItemView}
-        ListFooterComponent={renderFooter}
-        onEndReached={getData}
-        onEndReachedThreshold={0.5}
-      />
-    </SafeAreaView>
-  );
+      <View>
+          <SearchBar
+              placeholder="Ingresa nombre del restaurante..."
+              onChangeText={(e) => setSearch(e)}
+              containerStyle={styles.searchBar}
+              value={search}
+          />
+          {
+              size(restaurants) > 0 ? (
+                  <FlatList
+                      data={restaurants}
+                      keyExtractor={(item, index) => index.toString()}
+                      renderItem={(restaurant) => 
+                          <Restaurant
+                              restaurant={restaurant}
+                              navigation={navigation}
+                          />
+                      }
+                  />
+              ) : (
+                  isEmpty(search) ? (
+                      <Text style={styles.noFound}>
+                          Ingrese las primeras letras del nombre del restaurante.
+                      </Text>
+                  ) : (
+                      <Text style={styles.noFound}>
+                          No hay restaurantes que coincidan con el critertio de búsqueda.
+                      </Text>
+                  )
+              )
+          }
+      </View>
+  )
+}
+
+const Restaurant = ({ restaurant, navigation }) => {
+  const { id, name, images } = restaurant.item
+
+  return (
+      <ListItem
+          style={styles.menuItem}
+          onPress={() => navigation.navigate("restaurants", {
+              screen: "restaurant-stack",
+              params: { id, name }
+          })}
+      >
+          <Image
+              resizeMode="cover"
+              PlaceholderContent={<ActivityIndicator color="#fff"/>}
+              source={{ uri: images[0] }}
+              style={styles.imageRestaurant}
+          />
+          <ListItem.Content>
+              <ListItem.Title>{name}</ListItem.Title>
+          </ListItem.Content>
+          <Icon
+              type="material-community"
+              name="chevron-right"
+          />
+      </ListItem>
+  )
 }
 
 export default Search
 
 const styles = StyleSheet.create({
-    footer: {
-        padding: 10,
-        justifyContent: 'center',
-        alignItems: 'center',
-        flexDirection: 'row',
-      },
+  searchBar: {
+    marginBottom: 20,
+    backgroundColor: "#fff"
+  },
+  imageRestaurant: {
+      width: 90,
+      height: 90
+  },
+  noFound: {
+      alignSelf: "center",
+      width: "90%"
+  },
+  menuItem: {
+      margin: 10
+  }
 })

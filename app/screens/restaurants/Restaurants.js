@@ -36,20 +36,20 @@ const Restaurants = ({navigation}) => {
         if (response.statusResponse) {
             setStartRestaurant(response.startRestaurant)
             setRestaurants([...restaurants, ...response.restaurants])
-            setLoading(false)
             setPagination(true)
         }
+        setLoading(false)
     }
 
     const renderFooter = () => {
         return (
           // Footer View with Loader
           <View style={styles.footer}>
-            {loading ? (
+            { loading ? (
               <ActivityIndicator
                 color="black"
                 style={{margin: 15}} />
-            ) : null}
+            ) : null }
           </View>
         )
     }
