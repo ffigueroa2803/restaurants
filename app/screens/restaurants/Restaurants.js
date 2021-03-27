@@ -8,7 +8,7 @@ import 'firebase/auth'
 
 import Loading from '../../components/Loading'
 import ListRestaurants from '../../components/restaurants/ListRestaurants'
-import { getMoreRestaurants, getRestaurants } from '../../utils/actions'
+import { getRestaurants } from '../../utils/actions'
 
 const Restaurants = ({navigation}) => {
 

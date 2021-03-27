@@ -13,12 +13,20 @@ const AccountStack = () => {
             <Stack.Screen 
                 name="account-stack"
                 component={Account}
-                options={{ title:"Cuenta" }}
+                options={{ 
+                    title:"Cuenta",
+                    headerLeft: null,
+                    gestureEnabled: false
+                }}
             />
             <Stack.Screen 
                 name="login-stack"
                 component={Login}
-                options={{ title:"Iniciar Sesión" }}
+                options={{ 
+                    title:"Iniciar Sesión",
+                    headerLeft: null,
+                    gestureEnabled: false
+                }}
             />
             <Stack.Screen 
                 name="register-stack"
