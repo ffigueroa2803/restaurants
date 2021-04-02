@@ -35,6 +35,7 @@ const Restaurants = ({navigation}) => {
                 if (response.statusResponse) {
                     setStartRestaurant(response.startRestaurant)
                     setRestaurants(response.restaurants)
+                    setPagination(true)
                 }
                 setLoading(false)
             }
@@ -45,10 +46,9 @@ const Restaurants = ({navigation}) => {
     const handleLoadMore = async() => {
         setIsMoreLoading(true)
         const response = await getRestaurants(limitRestaurants, startRestaurant, pagination)
-        if (response.statusResponse) {
+        if (response.statusResponse && pagination) {
             setStartRestaurant(response.startRestaurant)
             setRestaurants([...restaurants, ...response.restaurants])
-            setPagination(true)
         }
         setIsMoreLoading(false)
         onEndReachedCalledDuringMomentum = true
